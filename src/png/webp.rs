@@ -10,8 +10,8 @@ pub fn png_to_webp(input_path: &str, output_path: &str, qualities: &[u32]) -> an
 
     for &quality in qualities {
         let quality = quality.clamp(1, 100) as u8; // 确保质量值在1-100范围内并转为u8
-        let output_file_name = super::jpg::format_output_path(output_path, quality);
-        
+        let output_file_name = super::jpg::format_output_path(output_path, quality, "webp");
+
         // 确保输出目录存在
         if let Some(parent) = std::path::Path::new(&output_file_name).parent() {
             std::fs::create_dir_all(parent)

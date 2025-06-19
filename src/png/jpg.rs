@@ -49,7 +49,7 @@ pub fn png_to_jpeg(input_path: &str, output_path: &str, qualities: &[u32]) -> an
         let quality = quality.clamp(1, 100) as u8; // 确保质量值在1-100范围内并转为u8
 
         // 构建输出路径，添加质量后缀
-        let output_file_name = format_output_path(output_path, quality);
+        let output_file_name = format_output_path(output_path, quality, "jpg");
 
         // 确保输出目录存在
         if let Some(parent) = Path::new(&output_file_name).parent() {
@@ -69,7 +69,7 @@ pub fn png_to_jpeg(input_path: &str, output_path: &str, qualities: &[u32]) -> an
 }
 
 // 格式化输出路径，处理质量后缀
-pub fn format_output_path(output_path: &str, quality: u8) -> String {
+pub fn format_output_path(output_path: &str, quality: u8, suffix: &str) -> String {
     // 检查输出路径是否以 / 结尾
     if output_path.ends_with('/') {
         return format!("{}image-q{}.jpg", output_path, quality);
@@ -82,7 +82,7 @@ pub fn format_output_path(output_path: &str, quality: u8) -> String {
     let parent = path.parent().unwrap_or_else(|| Path::new(""));
     
     // 构建新路径 - 添加质量后缀
-    parent.join(format!("{}-q{}.jpg", stem, quality))
+    parent.join(format!("{}-q{}.{}", stem, quality, suffix))
         .to_string_lossy()
         .into_owned()
 }
