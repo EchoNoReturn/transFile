@@ -1,3 +1,6 @@
 /target
 .DS_Store
+# 测试文件
 /test_file
+# 测试输出目录
+/output
