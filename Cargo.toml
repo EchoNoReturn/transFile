@@ -9,3 +9,4 @@ icns = "0.3.1"
 anyhow = "1.0"
 clap = { version = "4.4", features = ["derive", "cargo"] }
 ico = "0.4.0"
+webp = "0.3.0"

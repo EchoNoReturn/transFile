@@ -4,6 +4,7 @@ use clap::{Arg, ArgMatches, Command};
 mod icns;
 mod ico;
 mod jpg;
+mod webp;
 
 // 定义 PNG 子命令的参数结构
 pub struct PngArgs {
@@ -88,8 +89,9 @@ pub fn execute(matches: ArgMatches) -> Result<()> {
         "jpeg" => {
             jpg::png_to_jpeg(&args.input_path, &args.output_path, &args.quality)?;
         }
-        "webp" => println!("转换为 WEBP 格式"),
-        "bmp" => println!("转换为 BMP 格式"),
+        "webp" => {
+            webp::png_to_webp(&args.input_path, &args.output_path, &args.quality)?;
+        },
         _ => return Err(anyhow::anyhow!("不支持的目标格式: {}", args.target_format)),
     }
     Ok(())

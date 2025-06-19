@@ -36,7 +36,6 @@ pub fn png_to_jpeg(input_path: &str, output_path: &str, qualities: &[u32]) -> an
         img.write_to(&mut std::io::BufWriter::new(output_file), ImageOutputFormat::Jpeg(quality))
             .context("写入 JPEG 文件失败")?;
             
-        println!("成功转换为 JPEG 格式 (质量: {}): {}", quality, output_path);
         return Ok(());
     }
 
@@ -64,15 +63,13 @@ pub fn png_to_jpeg(input_path: &str, output_path: &str, qualities: &[u32]) -> an
             &mut std::io::BufWriter::new(output_file), 
             ImageOutputFormat::Jpeg(quality)
         ).context("写入 JPEG 文件失败")?;
-        
-        println!("成功转换为 JPEG 格式 (质量: {}): {}", quality, output_file_name);
     }
     
     Ok(())
 }
 
 // 格式化输出路径，处理质量后缀
-fn format_output_path(output_path: &str, quality: u8) -> String {
+pub fn format_output_path(output_path: &str, quality: u8) -> String {
     // 检查输出路径是否以 / 结尾
     if output_path.ends_with('/') {
         return format!("{}image-q{}.jpg", output_path, quality);
