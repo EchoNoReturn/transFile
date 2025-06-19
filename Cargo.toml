@@ -1,6 +1,8 @@
 [package]
 name = "transFile"
-version = "0.1.0"
+version = "0.0.2"
+authors = ["YOYOJ"]
+description = "一个简单易用的文件转换工具，支持多种图片格式转换"
 edition = "2024"
 
 [dependencies]

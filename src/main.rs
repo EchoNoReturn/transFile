@@ -5,9 +5,9 @@ mod jpeg;
 
 fn main() {
     let matches = commands::build_command()
-        .version("0.0.2")
-        .author("YOYOJ")
-        .about("一个简单易用的文件转换工具")
+        .version(env!("CARGO_PKG_VERSION"))
+        .author(env!("CARGO_PKG_AUTHORS"))
+        .about(env!("CARGO_PKG_DESCRIPTION"))
         .get_matches();
     commands::execute(matches);
 }
