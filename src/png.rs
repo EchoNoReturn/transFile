@@ -1,6 +1,7 @@
 use anyhow::Result;
 use clap::{Arg, ArgMatches, Command};
 
+mod app_icon;
 mod icns;
 mod ico;
 mod jpg;
@@ -10,7 +11,7 @@ mod webp;
 pub struct PngArgs {
     pub target_format: String,
     pub size: Vec<u32>,
-    pub quality: Vec<u32>,   // JPEG 质量参数
+    pub quality: Vec<u32>, // JPEG 质量参数
     pub input_path: String,
     pub output_path: String,
 }
@@ -22,9 +23,9 @@ pub fn build() -> Command {
             Arg::new("target")
                 .short('t')
                 .long("to")
-                .help("目标格式 (icns, ico, jpeg, webp, etc.) \n icns 如果使用多个尺寸会分别输出 \n ICO 文件可以包含多个尺寸的图标, ICO 格式通常支持的尺寸有限，常用的是 16, 32, 48, 64, 128, 256 \n")
+                .help("目标格式 (icns, ico, jpeg, webp, appicon, etc.) \n icns 如果使用多个尺寸会分别输出 \n ICO 文件可以包含多个尺寸的图标, ICO 格式通常支持的尺寸有限，常用的是 16, 32, 48, 64, 128, 256 \n")
                 .required(true)
-                .value_parser(["icns", "ico", "jpeg", "webp", "bmp"]),
+                .value_parser(["icns", "ico", "jpeg", "webp", "bmp", "appicon"]),
         )
         .arg(
             Arg::new("size")
@@ -45,6 +46,14 @@ pub fn build() -> Command {
                 .default_value("100")
                 .value_parser(clap::value_parser!(u32))
                 .num_args(1)
+        )
+        .arg(
+            Arg::new("filter")
+                .short('f')
+                .long("filter")
+                .help("生成 appicon 缩放时使用的滤镜类型（从左到右生成时间越来越长，但质量越来越好）")
+                .default_value("Lanczos3")
+                .value_parser(["Nearest", "Triangle", "CatmullRom", "Gaussian", "Lanczos3"]),
         )
         .arg(
             Arg::new("input")
@@ -73,9 +82,7 @@ pub fn execute(matches: ArgMatches) -> Result<()> {
             }),
         quality: matches
             .get_many::<u32>("quality")
-            .map_or(vec![100], |q| {
-                q.copied().collect()
-            }),
+            .map_or(vec![100], |q| q.copied().collect()),
         input_path: matches.get_one::<String>("input").unwrap().clone(),
         output_path: matches.get_one::<String>("output").unwrap().clone(),
     };
@@ -91,7 +98,12 @@ pub fn execute(matches: ArgMatches) -> Result<()> {
         }
         "webp" => {
             webp::png_to_webp(&args.input_path, &args.output_path, &args.quality)?;
-        },
+        }
+        "appicon" => {
+            let filter_type =
+                app_icon::get_filter_type(matches.get_one::<String>("filter").unwrap());
+            app_icon::png_to_app_icon(&args.input_path, &args.output_path, filter_type)?;
+        }
         _ => return Err(anyhow::anyhow!("不支持的目标格式: {}", args.target_format)),
     }
     Ok(())
