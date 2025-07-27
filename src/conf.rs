@@ -1,10 +1,29 @@
 use serde::{Deserialize, Serialize};
 use std::fs::{File};
 use std::io::{Read};
+use std::path::PathBuf;
 use upload::common::upload_types;
 
-pub const CONFIG_FILE: &str = "config/config.toml";
+/// 获取配置文件路径
+pub fn get_config_file_path() -> PathBuf {
+    let home_dir = dirs::home_dir()
+        .expect("无法获取用户主目录");
+    
+    home_dir.join(".transFile").join("config.toml")
+}
 
+/// 配置文件路径的字符串表示
+pub fn get_config_file_str() -> String {
+    get_config_file_path()
+        .to_string_lossy()
+        .to_string()
+}
+
+// 为了向后兼容，保留常量（但使用函数获取）
+lazy_static::lazy_static! {
+    #[derive(Debug)]
+    pub static ref CONFIG_FILE: String = get_config_file_str();
+}
 #[derive(Deserialize, Serialize, Debug)]
 pub struct Config {
     pub upload: UploadConfig,
