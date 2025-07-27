@@ -6,10 +6,10 @@ pub fn command_builder() -> clap::Command {
     clap::Command::new("upload")
         .about("上传文件到图床服务")
         .arg(
-            Arg::new("input")
-                .index(1)
-                .help("输入文件路径")
+            Arg::new("inputs")
+                .help("输入文件路径(支持多张图片上传)")
                 .required(true)
+                .num_args(1..) // 支持多张图片上传
                 .value_parser(clap::value_parser!(String)),
         )
 }
@@ -25,11 +25,17 @@ pub async fn execute(matches: ArgMatches) {
     );
 
     let config = config.upload.parse_to_upload_config();
-    let input_path = matches.get_one::<String>("input").unwrap();
-    let result = upload_util::upload_image(&input_path, config).await;
-    if result.success {
-        println!("上传成功，文件 URL: {}", result.url);
-    } else {
-        eprintln!("上传失败: {}", result.err_msg);
+
+    let input_paths: Vec<&String> = matches
+        .get_many::<String>("inputs")
+        .unwrap_or_default()
+        .collect();
+
+    let mut results: Vec<upload_util::common::upload_types::UploadResult> = Vec::new();
+    for input_path in input_paths {
+        let result = upload_util::upload_image(input_path, config.clone()).await;
+        results.push(result);
     }
+
+    print!("{}", serde_json::to_string_pretty(&results).unwrap());
 }

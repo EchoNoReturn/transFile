@@ -4063,6 +4063,7 @@ dependencies = [
  "ico",
  "image 0.24.9",
  "serde",
+ "serde_json",
  "tokio",
  "toml",
  "upload",

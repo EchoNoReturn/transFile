@@ -27,13 +27,24 @@ pub async fn upload_image(
     match aliyun_oss_client.upload(path, &prefix).await {
         Ok(url) => common::upload_types::UploadResult {
             success: true,
-            url,
-            err_msg: String::new(),
+            url: url.clone(),
+            error: None,
+            file_name: path.to_string(),
+            // 从上传后的 url 中获取上传后的文件路径
+            uploaded_path: url
+                .split_once("aliyuncs.com/")
+                .map(|(_, after_domain)| {
+                    let path = after_domain.trim_start_matches('/');
+                    path.to_string()
+                })
+                .unwrap_or_else(|| String::new()),
         },
         Err(e) => common::upload_types::UploadResult {
             success: false,
             url: String::new(),
-            err_msg: e.to_string(),
+            error: Some(e.to_string()),
+            file_name: path.to_string(),
+            uploaded_path: String::new(),
         },
     }
 }
@@ -41,9 +52,9 @@ pub async fn upload_image(
 #[cfg(test)]
 mod tests {
     use super::*;
-    use tokio;
     use dotenv;
     use std::env;
+    use tokio;
 
     #[tokio::test]
     async fn test_upload_image() {
@@ -52,27 +63,23 @@ mod tests {
 
         let domain = env::var("ALIYUN_OSS_DOMAIN")
             .unwrap_or_else(|_| "oss-cn-shanghai.aliyuncs.com".to_string());
-        let access_key = env::var("ALIYUN_ACCESS_KEY")
-            .expect("请设置环境变量 ALIYUN_ACCESS_KEY");
-        let secret_key = env::var("ALIYUN_SECRET_KEY")
-            .expect("请设置环境变量 ALIYUN_SECRET_KEY");
-        let bucket_name = env::var("ALIYUN_BUCKET_NAME")
-            .unwrap_or_else(|_| "test-bucket".to_string());
-        let region = env::var("ALIYUN_REGION")
-            .unwrap_or_else(|_| "oss-cn-shanghai".to_string());
-        let prefix = env::var("ALIYUN_PREFIX")
-            .unwrap_or_else(|_| "test/".to_string());
+        let access_key = env::var("ALIYUN_ACCESS_KEY").expect("请设置环境变量 ALIYUN_ACCESS_KEY");
+        let secret_key = env::var("ALIYUN_SECRET_KEY").expect("请设置环境变量 ALIYUN_SECRET_KEY");
+        let bucket_name =
+            env::var("ALIYUN_BUCKET_NAME").unwrap_or_else(|_| "test-bucket".to_string());
+        let region = env::var("ALIYUN_REGION").unwrap_or_else(|_| "oss-cn-shanghai".to_string());
+        let prefix = env::var("ALIYUN_PREFIX").unwrap_or_else(|_| "test/".to_string());
 
-        let config = common::upload_types::UploadConfig::new(
-            domain,
-            access_key,
-            secret_key,
-            bucket_name,
+        let config =
+            common::upload_types::UploadConfig::new(domain, access_key, secret_key, bucket_name)
+                .with_region(region)
+                .with_prefix(prefix);
+        let result = upload_image(
+            "/Users/jgl/CodeSpace/rustSpace/transfile/output/sss.png",
+            config,
         )
-        .with_region(region)
-        .with_prefix(prefix);
-        let result = upload_image("/Users/jgl/CodeSpace/rustSpace/transfile/output/sss.png", config).await;
-        assert!(result.success, "err: {}", result.err_msg);
+        .await;
+        assert!(result.success, "err: {}", result.error.unwrap_or_default());
         println!("上传成功: {}", result.url);
         // 这里可以添加更多的断言或逻辑
     }

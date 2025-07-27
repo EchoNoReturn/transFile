@@ -1,7 +1,8 @@
 pub mod upload_types {
+    use serde::{Deserialize, Serialize};
     use std::time::Duration;
 
-    #[derive(Debug, Clone)]
+    #[derive(Debug, Clone, Serialize, Deserialize)]
     pub struct UploadConfig {
         /// 必选，指定上传域名
         pub domain: String,
@@ -55,10 +56,13 @@ pub mod upload_types {
         }
     }
 
+    #[derive(Debug, Clone, Serialize, Deserialize)]
     pub struct UploadResult {
         pub success: bool,
         pub url: String,
-        pub err_msg: String,
+        pub error: Option<String>,
+        pub file_name: String,
+        pub uploaded_path: String,
     }
 }
 
