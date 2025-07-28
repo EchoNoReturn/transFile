@@ -37,5 +37,14 @@ pub async fn execute(matches: ArgMatches) {
         results.push(result);
     }
 
-    print!("{}", serde_json::to_string_pretty(&results).unwrap());
+    println!("Upload Success: ");
+    for result in &results {
+        if result.success {
+            println!("{}", result.url);
+        } else {
+            println!("上传失败: {}", result.error.as_deref().unwrap_or("未知错误"));
+        }
+    }
+
+    // print!("{}", serde_json::to_string_pretty(&results).unwrap());
 }
