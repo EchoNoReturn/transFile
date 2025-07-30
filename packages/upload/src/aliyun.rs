@@ -18,7 +18,11 @@ impl AliOssClient {
         endpoint: &str,
         bucket: &str,
     ) -> Self {
-      let domain = format!("{}.aliyuncs.com", region);
+        let domain = if !endpoint.is_empty() {
+            endpoint.to_string()
+        } else {
+            format!("{}.aliyuncs.com", region)
+        };
         let oss_client = OSS::new(
             access_key_id.to_string(),
             access_key_secret.to_string(),
