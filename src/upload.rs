@@ -16,13 +16,12 @@ pub fn command_builder() -> clap::Command {
 
 pub async fn execute(matches: ArgMatches) {
     // 读取配置文件
-    let config = conf::load_config(&conf::CONFIG_FILE).expect(
-        format!(
+    let config = conf::load_config(&conf::CONFIG_FILE).unwrap_or_else(|_| {
+        panic!(
             "加载配置失败，请检查配置文件路径和格式，或确保配置文件存在于{:?}",
             conf::CONFIG_FILE
         )
-        .as_str(),
-    );
+    });
 
     let config = config.upload.parse_to_upload_config();
 
