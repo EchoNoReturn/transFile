@@ -5,9 +5,10 @@ pub fn build_command() -> Command {
         .subcommand(crate::png::build())
         .subcommand(crate::webp::build())
         .subcommand(crate::jpeg::build())
+        .subcommand(crate::upload::command_builder())
 }
 
-pub fn execute(matches: ArgMatches) {
+pub async fn execute(matches: ArgMatches) {
     match matches.subcommand() {
         Some(("png", sub_matches)) => {
             if let Err(e) = crate::png::execute(sub_matches.clone()) {
@@ -23,6 +24,9 @@ pub fn execute(matches: ArgMatches) {
             if let Err(e) = crate::jpeg::execute(sub_matches.clone()) {
                 eprintln!("jpeg 命令执行出错: {}", e);
             }
+        },
+        Some(("upload", sub_matches)) => {
+            crate::upload::execute(sub_matches.clone()).await;
         },
         _ => eprintln!("未知的命令"),
     }

@@ -72,7 +72,7 @@ pub fn png_to_jpeg(input_path: &str, output_path: &str, qualities: &[u32]) -> an
 pub fn format_output_path(output_path: &str, quality: u8, suffix: &str) -> String {
     // 检查输出路径是否以 / 结尾
     if output_path.ends_with('/') {
-        return format!("{}image-q{}.jpg", output_path, quality);
+        return format!("{}image-q{}.{}", output_path, quality, suffix);
     }
     
     // 获取基本路径（不含扩展名）和目录

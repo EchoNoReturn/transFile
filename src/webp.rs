@@ -4,7 +4,7 @@ pub struct WebpArgs {
     pub input_path: String,
     pub output_path: String,
     pub target_formate: String, // 目前仅支持 png
-    pub quality: u8,           // WebP 质量，范围 1-100
+    pub quality: u8,            // WebP 质量，范围 1-100
 }
 
 pub fn build() -> clap::Command {
@@ -25,12 +25,12 @@ pub fn build() -> clap::Command {
                 .value_parser(clap::value_parser!(String)),
         )
         .arg(
-          clap::Arg::new("target")
-            .short('t')
-            .long("to")
-            .help("目标格式 (目前仅支持 png)")
-            .default_value("png")
-            .value_parser(["png"]),
+            clap::Arg::new("target")
+                .short('t')
+                .long("to")
+                .help("目标格式 (目前仅支持 png)")
+                .default_value("png")
+                .value_parser(["png"]),
         )
         .arg(
             clap::Arg::new("quality")
@@ -56,9 +56,12 @@ pub fn execute(matches: clap::ArgMatches) -> anyhow::Result<()> {
     match webp_args.target_formate.as_str() {
         "png" => {
             png::webp_to_png(&webp_args.input_path, &webp_args.output_path, quality)?;
-        },
+        }
         _ => {
-            return Err(anyhow::anyhow!("不支持的目标格式: {}", webp_args.target_formate));
+            return Err(anyhow::anyhow!(
+                "不支持的目标格式: {}",
+                webp_args.target_formate
+            ));
         }
     }
 

@@ -1,0 +1,7 @@
+[upload]
+access_key = ""
+secret_key = ""
+region = ""
+domain = ""
+bucket_name = ""
+prefix = ""
