@@ -4,9 +4,6 @@ use aliyun_oss_rust_sdk::request::RequestBuilder;
 use async_trait::async_trait;
 
 pub struct AliOssClient {
-    // access_key_id: String,
-    // access_key_secret: String,
-    // region: String,
     endpoint: String,
     bucket: String,
     oss_client: OSS,
@@ -30,34 +27,12 @@ impl AliOssClient {
         );
         let request_builder = RequestBuilder::new();
         Self {
-            // access_key_id: access_key_id.to_string(),
-            // access_key_secret: access_key_secret.to_string(),
-            // region: region.to_string(),
             endpoint: endpoint.to_string(),
             bucket: bucket.to_string(),
             oss_client,
             request_builder,
         }
     }
-
-    // pub fn get_upload_url(&self, key: &str, mime_type: &str, expires: i64) -> String {
-    //     let mut content_type: String = "application/octet-stream".to_string(); // 默认 MIME 类型
-    //     if !mime_type.is_empty() {
-    //         content_type = mime_type.to_string();
-    //     }
-
-    //     let build = self
-    //         .request_builder
-    //         .clone()
-    //         .with_expire(expires)
-    //         .with_content_type(content_type);
-    //     self.oss_client.sign_upload_url(key, &build)
-    // }
-
-    // pub async fn get_object_metadata(&self, key: &str) -> Result<ObjectMetadata, OssError> {
-    //     let builder = self.request_builder.clone();
-    //     self.oss_client.get_object_metadata(key, builder).await
-    // }
 
     pub async fn upload_file(&self, key: &str, file_path: &str) -> Result<String, OssError> {
         // 判断文件是否存在
@@ -118,7 +93,7 @@ impl crate::common::UploadStrategy for AliOssClient {
         "aliyun"
     }
 
-    fn get_read_url(&self, key: &str) -> &str {
-        Box::leak(format!("https://{}.{}/{}", self.bucket, self.endpoint, key).into_boxed_str())
+    fn get_read_url(&self, key: &str) -> String {
+        format!("https://{}.{}/{}", self.bucket, self.endpoint, key)
     }
 }

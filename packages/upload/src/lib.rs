@@ -56,10 +56,39 @@ mod tests {
     use std::env;
     use tokio;
 
+    fn get_test_image_path() -> String {
+        let args: Vec<String> = env::args().collect();
+
+        for (i, arg) in args.iter().enumerate() {
+            if arg == "--test-image" && i + 1 < args.len() {
+                return args[i + 1].clone();
+            }
+        }
+
+        env::var("TEST_IMAGE_PATH").unwrap_or_else(|_| {
+            // TODO : 使用默认测试图片路径
+            "/path/to/test/image.png".to_string()
+        })
+    }
+
     #[tokio::test]
     async fn test_upload_image() {
         // dotenv::dotenv().ok();
         dotenv::from_filename(".env.test.local").ok();
+
+        let test_image_path = get_test_image_path();
+        println!("📁 使用测试图片: {}", test_image_path);
+
+        // 验证文件存在
+        if !std::path::Path::new(&test_image_path).exists() {
+            println!("⚠️  测试图片不存在: {}", test_image_path);
+            println!("💡 使用方法:");
+            println!(
+                "   cargo test test_upload_image -- --test-image /path/to/image.png --nocapture"
+            );
+            println!("   或设置环境变量: TEST_IMAGE_PATH=/path/to/image.png cargo test");
+            return;
+        }
 
         let domain = env::var("ALIYUN_OSS_DOMAIN")
             .unwrap_or_else(|_| "oss-cn-shanghai.aliyuncs.com".to_string());
@@ -74,23 +103,9 @@ mod tests {
             common::upload_types::UploadConfig::new(domain, access_key, secret_key, bucket_name)
                 .with_region(region)
                 .with_prefix(prefix);
-        let result = upload_image(
-            "/Users/jgl/CodeSpace/rustSpace/transfile/output/sss.png",
-            config,
-        )
-        .await;
+        let result = upload_image(test_image_path.as_str(), config).await;
         assert!(result.success, "err: {}", result.error.unwrap_or_default());
         println!("上传成功: {}", result.url);
         // 这里可以添加更多的断言或逻辑
     }
 }
-//             "yoyoj-dev".to_string(),
-//         )
-//         .with_region("oss-cn-shanghai".to_string())
-//         .with_prefix("test/".to_string());
-//         let result = upload_image("/Users/jgl/CodeSpace/rustSpace/transfile/output/sss.png", config).await;
-//         assert!(result.success, "err: {}", result.err_msg);
-//         println!("上传成功: {}", result.url);
-//         // 这里可以添加更多的断言或逻辑
-//     }
-// }

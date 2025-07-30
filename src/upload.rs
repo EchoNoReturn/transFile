@@ -45,6 +45,4 @@ pub async fn execute(matches: ArgMatches) {
             println!("上传失败: {}", result.error.as_deref().unwrap_or("未知错误"));
         }
     }
-
-    // print!("{}", serde_json::to_string_pretty(&results).unwrap());
 }

@@ -75,5 +75,5 @@ pub trait UploadStrategy {
         prefix: &str,
     ) -> Result<String, Box<dyn std::error::Error>>;
     fn get_provider_name(&self) -> &str;
-    fn get_read_url(&self, key: &str) -> &str;
+    fn get_read_url(&self, key: &str) -> String;
 }
