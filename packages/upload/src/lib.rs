@@ -18,11 +18,7 @@ pub async fn upload_image(
         config.bucket_name.clone().as_str(),
     );
 
-    let prefix = if config.prefix.is_some() {
-        config.prefix.unwrap()
-    } else {
-        String::new()
-    };
+    let prefix = config.prefix.unwrap_or_else(String::new);
 
     match aliyun_oss_client.upload(path, &prefix).await {
         Ok(url) => common::upload_types::UploadResult {
